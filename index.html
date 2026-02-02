@@ -1,0 +1,765 @@
+<!doctype html>
+<html lang="pt-BR" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Infológica - Loja de Informática</title>
+  <link rel="icon" type="image/jpeg" href="Logo/Logo%20clean.jpeg">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    * {
+      font-family: 'Outfit', sans-serif;
+    }
+    html {
+      scroll-behavior: smooth;
+    }
+    .gradient-text,
+    .text-cyan-400:not(svg),
+    .text-blue-400:not(svg),
+    .text-purple-400:not(svg),
+    .text-green-400:not(svg),
+    .text-orange-400:not(svg),
+    .text-red-400:not(svg) {
+      background: linear-gradient(
+        90deg,
+        #22d3ee 0%,
+        #38bdf8 25%,
+        #3b82f6 50%,
+        #38bdf8 75%,
+        #22d3ee 100%
+      );
+      background-size: 250% 100%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
+      animation: text-wave 4s ease-in-out infinite;
+    }
+    @keyframes text-wave {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+    .card-hover {
+      transition: all 0.3s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(6, 182, 212, 0.15);
+    }
+    .glow-border {
+      position: relative;
+    }
+    .glow-border::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      background: linear-gradient(135deg, #06b6d4, #3b82f6, #06b6d4);
+      border-radius: inherit;
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .glow-border:hover::before {
+      opacity: 1;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    .float-animation {
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(6, 182, 212, 0.3); }
+      50% { box-shadow: 0 0 40px rgba(6, 182, 212, 0.6); }
+    }
+    .pulse-glow {
+      animation: pulse-glow 2s ease-in-out infinite;
+    }
+    .mouse-glow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 160px;
+      height: 160px;
+      pointer-events: none;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.18) 0%, rgba(6, 182, 212, 0.08) 35%, rgba(0, 0, 0, 0) 70%);
+      mix-blend-mode: screen;
+      filter: blur(8px);
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      z-index: 1;
+    }
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: radial-gradient(rgba(59, 130, 246, 0.08) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: radial-gradient(circle at 50% 20%, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.2) 45%, transparent 70%);
+      opacity: 0.6;
+      animation: grid-drift 12s linear infinite;
+      z-index: 0;
+    }
+    #particle-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+    @keyframes grid-drift {
+      0% { background-position: 0 0; }
+      100% { background-position: 40px 40px; }
+    }
+    .reveal {
+      opacity: 0;
+      transform: translateY(22px) scale(0.98);
+      filter: blur(6px);
+      transition: opacity 0.7s ease, transform 0.7s ease, filter 0.7s ease;
+      will-change: opacity, transform;
+    }
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+    }
+    .mobile-menu {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 85%;
+      max-width: 320px;
+      height: 100vh;
+      background: rgba(10, 15, 28, 0.98);
+      backdrop-filter: blur(12px);
+      transition: right 0.3s ease;
+      z-index: 60;
+      border-left: 1px solid rgba(30, 41, 59, 0.6);
+    }
+    .mobile-menu.open {
+      right: 0;
+    }
+    .mobile-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.6);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 55;
+    }
+    .mobile-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full bg-gray-950 text-gray-100">
+  <canvas id="particle-canvas" aria-hidden="true"></canvas>
+  <div id="mouse-glow" class="mouse-glow" aria-hidden="true"></div>
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div id="app-wrapper" class="w-full h-full overflow-auto relative z-10"><!-- Navigation -->
+   <nav class="fixed top-0 left-0 right-0 z-50 bg-gray-950/90 backdrop-blur-md border-b border-gray-800/50">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+    <div class="grid grid-cols-2 md:grid-cols-3 items-center">
+      <div class="flex items-center gap-3">
+       <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center overflow-hidden">
+        <img src="Logo/Logo%20clean.jpeg" alt="Logo Infológica" class="w-10 h-10 object-contain" />
+       </div><span class="text-xl font-bold">Info<span class="text-cyan-400">lógica</span></span>
+      </div>
+      <div class="hidden md:flex items-center justify-center gap-8"><a href="#inicio" class="text-gray-400 hover:text-cyan-400 transition-colors text-sm font-medium">Início</a> <a href="#produtos" class="text-gray-400 hover:text-cyan-400 transition-colors text-sm font-medium">Produtos</a> <a href="#servicos" class="text-gray-400 hover:text-cyan-400 transition-colors text-sm font-medium">Serviços</a> <a href="#diferenciais" class="text-gray-400 hover:text-cyan-400 transition-colors text-sm font-medium">Diferenciais</a> <a href="#contato" class="text-gray-400 hover:text-cyan-400 transition-colors text-sm font-medium">Contato</a>
+      </div>
+      <div class="flex justify-end">
+       <button id="mobile-menu-button" class="md:hidden w-10 h-10 rounded-full bg-gray-800/60 text-gray-200 flex items-center justify-center" aria-label="Abrir menu">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+       </button>
+       <div class="hidden md:block"></div>
+      </div>
+     </div>
+    </div>
+  </nav>
+  <div id="mobile-overlay" class="mobile-overlay"></div>
+  <aside id="mobile-menu" class="mobile-menu md:hidden">
+   <div class="p-6 border-b border-gray-800/60 flex items-center justify-between">
+    <span class="text-lg font-semibold">Menu</span>
+    <button id="mobile-menu-close" class="w-10 h-10 rounded-full bg-gray-800/60 text-gray-200 flex items-center justify-center" aria-label="Fechar menu">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+    </button>
+   </div>
+   <nav class="flex flex-col gap-2 p-6">
+    <a href="#inicio" class="px-4 py-3 rounded-xl bg-gray-900/60 text-gray-200">Início</a>
+    <a href="#produtos" class="px-4 py-3 rounded-xl bg-gray-900/60 text-gray-200">Produtos</a>
+    <a href="#servicos" class="px-4 py-3 rounded-xl bg-gray-900/60 text-gray-200">Serviços</a>
+    <a href="#certificados" class="px-4 py-3 rounded-xl bg-gray-900/60 text-gray-200">Certificados</a>
+    <a href="#diferenciais" class="px-4 py-3 rounded-xl bg-gray-900/60 text-gray-200">Diferenciais</a>
+    <a href="#contato" class="px-4 py-3 rounded-xl bg-gray-900/60 text-gray-200">Contato</a>
+   </nav>
+  </aside><!-- Hero Section -->
+  <section id="inicio" class="relative min-h-[85vh] md:min-h-screen flex items-center justify-center overflow-hidden pt-16 md:pt-20 reveal"><!-- Background Effects -->
+    <div class="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950"></div>
+    <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 text-center">
+     <div class="inline-flex items-center gap-2 bg-gray-800/50 border border-gray-700/50 rounded-full px-4 py-2 mb-8"><span class="w-2 h-2 bg-cyan-400 rounded-full pulse-glow"></span> <span class="text-sm text-gray-400">Sua loja completa de informática em Viçosa</span>
+     </div>
+    <h1 id="hero-title" class="text-4xl sm:text-5xl md:text-7xl font-bold mb-6 leading-tight">Tecnologia que<br><span class="gradient-text">transforma</span></h1>
+    <p id="hero-subtitle" class="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto mb-10">Produtos de qualidade, serviços especializados e atendimento personalizado para você e sua empresa.</p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center"><a href="#produtos" class="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-8 py-4 rounded-full font-semibold hover:shadow-xl hover:shadow-cyan-500/30 transition-all text-base sm:text-lg"> Ver Produtos </a> <a href="#contato" class="bg-gray-800/50 border border-gray-700 text-white px-8 py-4 rounded-full font-semibold hover:bg-gray-800 transition-all text-base sm:text-lg"> Fale Conosco </a>
+     </div><!-- Stats -->
+    <div class="grid grid-cols-3 gap-4 sm:gap-8 mt-12 sm:mt-20 max-w-3xl mx-auto">
+      <div class="text-center">
+       <div class="text-3xl md:text-4xl font-bold text-cyan-400">
+        25+
+       </div>
+       <div class="text-sm text-gray-500 mt-1">
+        Anos de Experiência
+       </div>
+      </div>
+      <div class="text-center">
+       <div class="text-3xl md:text-4xl font-bold text-cyan-400">
+        5000+
+       </div>
+       <div class="text-sm text-gray-500 mt-1">
+        Clientes Atendidos
+       </div>
+      </div>
+      <div class="text-center">
+       <div class="text-3xl md:text-4xl font-bold text-cyan-400">
+        Garantia
+       </div>
+       <div class="text-sm text-gray-500 mt-1">
+        em Serviços
+       </div>
+      </div>
+     </div>
+    </div><!-- Scroll Indicator -->
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 float-animation">
+     <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+     </svg>
+    </div>
+   </section><!-- Featured Products -->
+  <section id="produtos" class="py-24 bg-gray-900/50 reveal">
+    <div class="max-w-7xl mx-auto px-6">
+     <div class="text-center mb-16"><span class="text-cyan-400 text-sm font-semibold uppercase tracking-wider">Produtos em Destaque</span>
+      <h2 class="text-4xl md:text-5xl font-bold mt-4">O melhor da <span class="gradient-text">tecnologia</span></h2>
+     </div>
+    <div class="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory -mx-6 px-6 md:mx-0 md:px-0 pb-2"><!-- Product 1 -->
+     <div class="card-hover bg-gray-900 border border-gray-800 rounded-2xl p-6 group min-w-[260px] sm:min-w-[280px] md:min-w-0 snap-start">
+       <div class="w-full h-48 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl flex items-center justify-center mb-6 overflow-hidden">
+        <img src="Logo/Cpu.png" alt="Computadores" loading="lazy" class="w-36 h-36 object-contain group-hover:scale-105 transition-transform" />
+       </div><span class="text-xs text-cyan-400 font-medium">COMPUTADORES</span>
+       <h3 class="text-lg font-semibold mt-2 mb-2">Computadores Completos</h3>
+       <p class="text-sm text-gray-500">Para uso pessoal, escritório e games</p>
+      </div><!-- Product 2 -->
+      <div class="card-hover bg-gray-900 border border-gray-800 rounded-2xl p-6 group min-w-[260px] sm:min-w-[280px] md:min-w-0 snap-start">
+       <div class="w-full h-48 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl flex items-center justify-center mb-6 overflow-hidden">
+        <img src="Logo/notebook.png" alt="Notebooks" loading="lazy" class="w-36 h-36 object-contain group-hover:scale-105 transition-transform" />
+       </div><span class="text-xs text-blue-400 font-medium">NOTEBOOKS</span>
+       <h3 class="text-lg font-semibold mt-2 mb-2">Notebooks</h3>
+       <p class="text-sm text-gray-500">Diversas marcas e configurações</p>
+      </div><!-- Product 3 -->
+      <div class="card-hover bg-gray-900 border border-gray-800 rounded-2xl p-6 group min-w-[260px] sm:min-w-[280px] md:min-w-0 snap-start">
+       <div class="w-full h-48 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl flex items-center justify-center mb-6 overflow-hidden">
+        <img src="Logo/impressora.png" alt="Impressoras" loading="lazy" class="w-36 h-36 object-contain group-hover:scale-105 transition-transform" />
+       </div><span class="text-xs text-purple-400 font-medium">IMPRESSORAS</span>
+       <h3 class="text-lg font-semibold mt-2 mb-2">Impressoras</h3>
+       <p class="text-sm text-gray-500">Modelos para casa e escritório</p>
+      </div><!-- Product 4 -->
+      <div class="card-hover bg-gray-900 border border-gray-800 rounded-2xl p-6 group min-w-[260px] sm:min-w-[280px] md:min-w-0 snap-start">
+       <div class="w-full h-48 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl flex items-center justify-center mb-6 overflow-hidden">
+        <img src="Logo/perifericos.png" alt="Periféricos" loading="lazy" class="w-36 h-36 object-contain group-hover:scale-105 transition-transform" />
+       </div><span class="text-xs text-green-400 font-medium">PEÇAS</span>
+       <h3 class="text-lg font-semibold mt-2 mb-2">Periféricos e Peças</h3>
+       <p class="text-sm text-gray-500">Acessórios e componentes</p>
+      </div>
+     </div>
+    </div>
+   </section><!-- Services Section -->
+  <section id="servicos" class="py-24 reveal">
+    <div class="max-w-7xl mx-auto px-6">
+     <div class="text-center mb-16"><span class="text-cyan-400 text-sm font-semibold uppercase tracking-wider">Nossos Serviços</span>
+      <h2 class="text-4xl md:text-5xl font-bold mt-4">Oficina <span class="gradient-text">especializada</span></h2>
+      <p class="text-gray-400 mt-4 max-w-2xl mx-auto">Contamos com uma equipe técnica qualificada para manutenção de computadores, notebooks e nobreaks.</p>
+     </div>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8"><!-- Service 1 -->
+      <div class="bg-gradient-to-br from-gray-900 to-gray-950 border border-gray-800 rounded-2xl p-8 card-hover">
+       <div class="w-14 h-14 rounded-xl bg-cyan-500/10 flex items-center justify-center mb-6">
+        <svg class="w-7 h-7 text-cyan-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+       </div>
+       <h3 class="text-xl font-semibold mb-3">Formatação com Backup</h3>
+       <p class="text-gray-500 text-sm leading-relaxed">Formatação completa com backup de todos os seus arquivos importantes. Seus dados seguros conosco.</p>
+      </div><!-- Service 2 -->
+      <div class="bg-gradient-to-br from-gray-900 to-gray-950 border border-gray-800 rounded-2xl p-8 card-hover">
+       <div class="w-14 h-14 rounded-xl bg-blue-500/10 flex items-center justify-center mb-6">
+        <svg class="w-7 h-7 text-blue-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+       </div>
+       <h3 class="text-xl font-semibold mb-3">Formatação sem Backup</h3>
+       <p class="text-gray-500 text-sm leading-relaxed">Formatação rápida e econômica para quem já possui seus arquivos salvos em outro local.</p>
+      </div><!-- Service 3 -->
+      <div class="bg-gradient-to-br from-gray-900 to-gray-950 border border-gray-800 rounded-2xl p-8 card-hover">
+       <div class="w-14 h-14 rounded-xl bg-purple-500/10 flex items-center justify-center mb-6">
+        <svg class="w-7 h-7 text-purple-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+        </svg>
+       </div>
+       <h3 class="text-xl font-semibold mb-3">Limpeza Interna</h3>
+       <p class="text-gray-500 text-sm leading-relaxed">Limpeza completa de computadores e notebooks. Melhore o desempenho e aumente a vida útil.</p>
+      </div><!-- Service 4 -->
+      <div class="bg-gradient-to-br from-gray-900 to-gray-950 border border-gray-800 rounded-2xl p-8 card-hover">
+       <div class="w-14 h-14 rounded-xl bg-green-500/10 flex items-center justify-center mb-6">
+        <svg class="w-7 h-7 text-green-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+       </div>
+       <h3 class="text-xl font-semibold mb-3">Manutenção de Nobreaks</h3>
+       <p class="text-gray-500 text-sm leading-relaxed">Reparo e manutenção especializada em nobreaks de todas as marcas e modelos.</p>
+      </div><!-- Service 5 -->
+      <div class="bg-gradient-to-br from-gray-900 to-gray-950 border border-gray-800 rounded-2xl p-8 card-hover">
+       <div class="w-14 h-14 rounded-xl bg-orange-500/10 flex items-center justify-center mb-6">
+        <svg class="w-7 h-7 text-orange-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+        </svg>
+       </div>
+       <h3 class="text-xl font-semibold mb-3">Upgrade de Hardware</h3>
+       <p class="text-gray-500 text-sm leading-relaxed">Atualize seu computador com mais memória, SSD e outros componentes para melhor performance.</p>
+      </div><!-- Service 6 -->
+      <div class="bg-gradient-to-br from-gray-900 to-gray-950 border border-gray-800 rounded-2xl p-8 card-hover">
+       <div class="w-14 h-14 rounded-xl bg-red-500/10 flex items-center justify-center mb-6">
+        <svg class="w-7 h-7 text-red-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+       </div>
+       <h3 class="text-xl font-semibold mb-3">Remoção de Vírus</h3>
+       <p class="text-gray-500 text-sm leading-relaxed">Diagnóstico e remoção completa de vírus, malwares e programas indesejados.</p>
+      </div>
+     </div>
+    </div>
+  </section><!-- Digital Certificates Section -->
+  <section id="certificados" class="py-24 bg-gray-900/50 reveal">
+   <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center mb-16"><span class="text-cyan-400 text-sm font-semibold uppercase tracking-wider">Certificados Digitais</span>
+    <h2 class="text-4xl md:text-5xl font-bold mt-4">E-CPF e E-CNPJ <span class="gradient-text">A1 e A3</span></h2>
+    <p class="text-gray-400 mt-4 max-w-2xl mx-auto">Emissão rápida e segura com suporte completo para pessoas físicas e jurídicas.</p>
+    </div>
+    <div class="grid md:grid-cols-2 gap-8">
+    <div class="bg-gradient-to-br from-gray-900 to-gray-950 border border-gray-800 rounded-2xl p-8 card-hover">
+     <div class="w-14 h-14 rounded-xl bg-cyan-500/10 flex items-center justify-center mb-6">
+      <svg class="w-7 h-7 text-cyan-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c1.657 0 3-1.343 3-3S13.657 5 12 5 9 6.343 9 8s1.343 3 3 3z" /> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 21v-2a4 4 0 014-4h6a4 4 0 014 4v2" />
+      </svg>
+     </div>
+     <h3 class="text-xl font-semibold mb-3">E-CPF</h3>
+     <p class="text-gray-500 text-sm leading-relaxed">Certificado para pessoas físicas nas versões A1 e A3.</p>
+    </div>
+    <div class="bg-gradient-to-br from-gray-900 to-gray-950 border border-gray-800 rounded-2xl p-8 card-hover">
+     <div class="w-14 h-14 rounded-xl bg-blue-500/10 flex items-center justify-center mb-6">
+      <svg class="w-7 h-7 text-blue-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 11h18M3 15h18M7 7v10" /> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z" />
+      </svg>
+     </div>
+     <h3 class="text-xl font-semibold mb-3">E-CNPJ</h3>
+     <p class="text-gray-500 text-sm leading-relaxed">Certificado para empresas nas versões A1 e A3.</p>
+    </div>
+    </div>
+   </div>
+  </section><!-- Differentials Section -->
+  <section id="diferenciais" class="py-24 bg-gray-900/50 reveal">
+    <div class="max-w-7xl mx-auto px-6">
+     <div class="text-center mb-16"><span class="text-cyan-400 text-sm font-semibold uppercase tracking-wider">Por que nos escolher</span>
+      <h2 class="text-4xl md:text-5xl font-bold mt-4">Nossos <span class="gradient-text">diferenciais</span></h2>
+     </div>
+     <div class="grid md:grid-cols-3 gap-8"><!-- Differential 1 -->
+      <div class="text-center group">
+       <div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-cyan-500/30 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+        <svg class="w-12 h-12 text-cyan-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+        </svg>
+       </div>
+       <h3 class="text-xl font-semibold mb-3">Estacionamento Exclusivo</h3>
+       <p class="text-gray-500">Estacionamento próprio e gratuito para nossos clientes. Comodidade e segurança para você.</p>
+      </div><!-- Differential 2 -->
+      <div class="text-center group">
+       <div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+        <svg class="w-12 h-12 text-blue-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+        </svg>
+       </div>
+       <h3 class="text-xl font-semibold mb-3">Oficina Especializada</h3>
+       <p class="text-gray-500">Técnicos certificados para manutenção de computadores, notebooks e nobreaks.</p>
+      </div><!-- Differential 3 -->
+      <div class="text-center group">
+       <div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+        <svg class="w-12 h-12 text-purple-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+       </div>
+       <h3 class="text-xl font-semibold mb-3">Atendimento Personalizado</h3>
+       <p class="text-gray-500">Cada cliente é único. Oferecemos soluções personalizadas para suas necessidades.</p>
+      </div>
+     </div>
+    </div>
+   </section><!-- Contact Section -->
+  <section id="contato" class="py-24 reveal">
+    <div class="max-w-7xl mx-auto px-6">
+     <div class="text-center mb-16"><span class="text-cyan-400 text-sm font-semibold uppercase tracking-wider">Entre em Contato</span>
+      <h2 class="text-4xl md:text-5xl font-bold mt-4">Fale <span class="gradient-text">conosco</span></h2>
+     </div>
+     <div class="grid lg:grid-cols-2 gap-12"><!-- Contact Info -->
+      <div class="space-y-8">
+       <div id="about-text" class="text-gray-400 text-lg leading-relaxed">
+        Estamos prontos para atender você! Entre em contato pelo WhatsApp, telefone ou visite nossa loja. Teremos prazer em ajudá-lo a encontrar a melhor solução para suas necessidades em tecnologia.
+       </div><!-- WhatsApp --> <a href="https://wa.me/5531985802848" target="_blank" rel="noopener noreferrer" class="flex items-center gap-4 bg-gradient-to-r from-green-500/10 to-green-600/10 border border-green-500/30 rounded-2xl p-6 hover:border-green-500/50 transition-all group">
+        <div class="w-14 h-14 rounded-xl bg-green-500 flex items-center justify-center">
+         <svg class="w-7 h-7 text-white" fill="currentColor" viewbox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+         </svg>
+        </div>
+        <div>
+         <div class="text-sm text-green-400 font-medium">
+          WhatsApp
+         </div>
+         <div class="text-xl font-semibold text-white group-hover:text-green-400 transition-colors">
+          (31) 98580-2848
+         </div>
+        </div>
+        <svg class="w-5 h-5 text-gray-500 ml-auto group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg></a> <!-- Phone --> <a href="tel:+553138912848" class="flex items-center gap-4 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/30 rounded-2xl p-6 hover:border-cyan-500/50 transition-all group">
+        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
+         <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+         </svg>
+        </div>
+        <div>
+         <div class="text-sm text-cyan-400 font-medium">
+          Telefone
+         </div>
+         <div class="text-xl font-semibold text-white group-hover:text-cyan-400 transition-colors">
+          (31) 3891-2848
+         </div>
+        </div>
+        <svg class="w-5 h-5 text-gray-500 ml-auto group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg></a> <!-- Instagram --> <a href="https://www.instagram.com/infologica/" target="_blank" rel="noopener noreferrer" class="flex items-center gap-4 bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/30 rounded-2xl p-6 hover:border-pink-500/50 transition-all group">
+        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-pink-500 via-red-500 to-yellow-500 flex items-center justify-center">
+         <svg class="w-7 h-7 text-white" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+         </svg>
+        </div>
+        <div>
+         <div class="text-sm text-pink-400 font-medium">
+          Instagram
+         </div>
+         <div class="text-xl font-semibold text-white group-hover:text-pink-400 transition-colors">
+          @infologica
+         </div>
+        </div>
+        <svg class="w-5 h-5 text-gray-500 ml-auto group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg></a>
+      </div><!-- Map / Location Card -->
+      <div class="bg-gradient-to-br from-gray-900 to-gray-950 border border-gray-800 rounded-3xl p-8">
+       <div class="flex items-center gap-3 mb-6">
+        <div class="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center">
+         <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+         </svg>
+        </div>
+        <div>
+         <h3 class="text-xl font-semibold">Av. Santa Rita 243</h3>
+         <p class="text-gray-500 text-sm">Visite nossa loja</p>
+        </div>
+       </div>
+       <div class="bg-gray-800/50 rounded-2xl p-6 mb-6">
+        <p id="address-text" class="text-gray-300 leading-relaxed">Viçosa - MG<br><span class="text-gray-500 text-sm">Estacionamento exclusivo para clientes</span></p>
+       </div>
+       <div class="grid grid-cols-2 gap-4">
+        <div class="bg-gray-800/30 rounded-xl p-4 text-center">
+         <svg class="w-8 h-8 text-cyan-400 mx-auto mb-2" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+         </svg>
+         <div class="text-sm text-gray-400">
+          Seg - Sex
+         </div>
+         <div class="text-white font-medium">
+          8h às 18h
+         </div>
+        </div>
+        <div class="bg-gray-800/30 rounded-xl p-4 text-center">
+         <svg class="w-8 h-8 text-cyan-400 mx-auto mb-2" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+         </svg>
+         <div class="text-sm text-gray-400">
+          Sábado
+         </div>
+         <div class="text-white font-medium">
+          8h às 12h
+         </div>
+        </div>
+      </div><a href="https://www.google.com/maps/place/Infol%C3%B3gica+Importa%C3%A7%C3%A3o+%26+Com%C3%A9rcio/@-20.7586973,-42.8837391,17z/data=!3m1!4b1!4m6!3m5!1s0xa367e61b20fe51:0x5df0385045fe0897!8m2!3d-20.7586974!4d-42.8788682!16s%2Fg%2F1tgf4ft4?authuser=0&entry=ttu&g_ep=EgoyMDI2MDEyMS4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer" class="mt-6 w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white py-4 rounded-xl font-semibold hover:shadow-xl hover:shadow-cyan-500/30 transition-all flex items-center justify-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+             </svg> Ver Localização </a>
+      </div>
+     </div>
+    </div>
+   </section><!-- Footer -->
+   <footer class="bg-gray-900 border-t border-gray-800 py-12">
+    <div class="max-w-7xl mx-auto px-6">
+     <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+      <div class="flex items-center gap-3">
+       <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center overflow-hidden">
+        <img src="Logo/Logo%20clean.jpeg" alt="Logo Infológica" class="w-10 h-10 object-contain" />
+       </div><span class="text-xl font-bold">Info<span class="text-cyan-400">lógica</span></span>
+      </div>
+      <div class="flex items-center gap-6"><a href="https://wa.me/5531985802848" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-green-500 transition-colors">
+        <svg class="w-5 h-5 text-gray-400 hover:text-white" fill="currentColor" viewbox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+        </svg></a> <a href="https://www.instagram.com/infologica/" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-gradient-to-br hover:from-pink-500 hover:to-purple-500 transition-all">
+        <svg class="w-5 h-5 text-gray-400 hover:text-white" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+        </svg></a>
+      </div>
+      <p class="text-gray-500 text-sm">© 2026 Infológica. Todos os direitos reservados.</p>
+     </div>
+    </div>
+   </footer>
+  </div>
+  <a href="https://wa.me/5531985802848" target="_blank" rel="noopener noreferrer" aria-label="Contato via WhatsApp" class="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-green-500 text-white flex items-center justify-center shadow-lg shadow-green-500/40 hover:scale-105 transition-transform">
+   <svg class="w-7 h-7" fill="currentColor" viewbox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+   </svg>
+  </a>
+  <script>
+    const mouseGlow = document.getElementById('mouse-glow');
+    if (mouseGlow && window.matchMedia('(pointer: fine)').matches) {
+      let rafId = null;
+      const updateGlow = (event) => {
+        const x = event.clientX;
+        const y = event.clientY;
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(() => {
+          mouseGlow.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
+          mouseGlow.style.opacity = '1';
+        });
+      };
+      window.addEventListener('mousemove', updateGlow, { passive: true });
+      window.addEventListener('mouseout', () => {
+        mouseGlow.style.opacity = '0';
+      }, { passive: true });
+    }
+
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mobileOverlay = document.getElementById('mobile-overlay');
+    const mobileMenuClose = document.getElementById('mobile-menu-close');
+
+    const closeMobileMenu = () => {
+      mobileMenu?.classList.remove('open');
+      mobileOverlay?.classList.remove('open');
+    };
+
+    const openMobileMenu = () => {
+      mobileMenu?.classList.add('open');
+      mobileOverlay?.classList.add('open');
+    };
+
+    mobileMenuButton?.addEventListener('click', openMobileMenu);
+    mobileMenuClose?.addEventListener('click', closeMobileMenu);
+    mobileOverlay?.addEventListener('click', closeMobileMenu);
+    mobileMenu?.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', closeMobileMenu);
+    });
+
+    const revealElements = document.querySelectorAll('.reveal');
+    if (revealElements.length) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
+
+      revealElements.forEach((el, index) => {
+        el.style.transitionDelay = `${Math.min(index * 80, 320)}ms`;
+        observer.observe(el);
+      });
+    }
+
+    const canvas = document.getElementById('particle-canvas');
+    if (canvas && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+
+      const resizeCanvas = () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const count = Math.min(70, Math.max(30, Math.floor(window.innerWidth / 25)));
+        particles = Array.from({ length: count }, () => ({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: Math.random() * 1.8 + 0.6,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: (Math.random() - 0.5) * 0.3,
+          a: Math.random() * 0.35 + 0.15
+        }));
+      };
+
+      const step = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const maxDist = 110;
+        for (const p of particles) {
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.x < -5) p.x = canvas.width + 5;
+          if (p.x > canvas.width + 5) p.x = -5;
+          if (p.y < -5) p.y = canvas.height + 5;
+          if (p.y > canvas.height + 5) p.y = -5;
+
+          ctx.beginPath();
+          ctx.fillStyle = `rgba(56,189,248,${p.a})`;
+          ctx.shadowColor = 'rgba(56,189,248,0.6)';
+          ctx.shadowBlur = 8;
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }
+
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const a = particles[i];
+            const b = particles[j];
+            const dx = a.x - b.x;
+            const dy = a.y - b.y;
+            const dist = Math.hypot(dx, dy);
+            if (dist < maxDist) {
+              const alpha = (1 - dist / maxDist) * 0.25;
+              ctx.beginPath();
+              ctx.strokeStyle = `rgba(59,130,246,${alpha})`;
+              ctx.lineWidth = 1;
+              ctx.moveTo(a.x, a.y);
+              ctx.lineTo(b.x, b.y);
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(step);
+      };
+
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas, { passive: true });
+      requestAnimationFrame(step);
+    }
+
+    const defaultConfig = {
+      hero_title: 'Tecnologia que transforma',
+      hero_subtitle: 'Produtos de qualidade, serviços especializados e atendimento personalizado para você e sua empresa.',
+      about_text: 'Estamos prontos para atender você! Entre em contato pelo WhatsApp, telefone ou visite nossa loja. Teremos prazer em ajudá-lo a encontrar a melhor solução para suas necessidades em tecnologia.',
+      address_text: 'Viçosa - MG',
+      background_color: '#030712',
+      surface_color: '#111827',
+      text_color: '#f3f4f6',
+      primary_color: '#06b6d4',
+      secondary_color: '#3b82f6'
+    };
+
+    let config = { ...defaultConfig };
+
+    async function onConfigChange(newConfig) {
+      config = { ...config, ...newConfig };
+
+      // Update hero title
+      const heroTitle = document.getElementById('hero-title');
+      if (heroTitle) {
+        const titleText = config.hero_title || defaultConfig.hero_title;
+        heroTitle.innerHTML = titleText.includes('transforma') 
+          ? titleText.replace('transforma', '<br><span class="gradient-text">transforma</span>')
+          : titleText;
+      }
+
+      // Update hero subtitle
+      const heroSubtitle = document.getElementById('hero-subtitle');
+      if (heroSubtitle) {
+        heroSubtitle.textContent = config.hero_subtitle || defaultConfig.hero_subtitle;
+      }
+
+      // Update about text
+      const aboutText = document.getElementById('about-text');
+      if (aboutText) {
+        aboutText.textContent = config.about_text || defaultConfig.about_text;
+      }
+
+      // Update address
+      const addressText = document.getElementById('address-text');
+      if (addressText) {
+        addressText.innerHTML = `${config.address_text || defaultConfig.address_text}<br><span class="text-gray-500 text-sm">Estacionamento próprio disponível</span>`;
+      }
+
+      // Apply colors
+      document.body.style.backgroundColor = config.background_color || defaultConfig.background_color;
+      document.body.style.color = config.text_color || defaultConfig.text_color;
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [
+          {
+            get: () => config.background_color || defaultConfig.background_color,
+            set: (value) => { config.background_color = value; window.elementSdk.setConfig({ background_color: value }); }
+          },
+          {
+            get: () => config.surface_color || defaultConfig.surface_color,
+            set: (value) => { config.surface_color = value; window.elementSdk.setConfig({ surface_color: value }); }
+          },
+          {
+            get: () => config.text_color || defaultConfig.text_color,
+            set: (value) => { config.text_color = value; window.elementSdk.setConfig({ text_color: value }); }
+          },
+          {
+            get: () => config.primary_color || defaultConfig.primary_color,
+            set: (value) => { config.primary_color = value; window.elementSdk.setConfig({ primary_color: value }); }
+          },
+          {
+            get: () => config.secondary_color || defaultConfig.secondary_color,
+            set: (value) => { config.secondary_color = value; window.elementSdk.setConfig({ secondary_color: value }); }
+          }
+        ],
+        borderables: [],
+        fontEditable: undefined,
+        fontSizeable: undefined
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ['hero_title', config.hero_title || defaultConfig.hero_title],
+        ['hero_subtitle', config.hero_subtitle || defaultConfig.hero_subtitle],
+        ['about_text', config.about_text || defaultConfig.about_text],
+        ['address_text', config.address_text || defaultConfig.address_text]
+      ]);
+    }
+
+    // Initialize SDK
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities,
+        mapToEditPanelValues
+      });
+    }
+
+    // Smooth scroll for navigation
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c29c5719002cae8',t:'MTc2OTE5NzMxNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
